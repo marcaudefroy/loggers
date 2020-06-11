@@ -48,29 +48,10 @@ func (l *Logger) Fields() []interface{} {
 	return fieldsToSlice(l.Entry.Data)
 }
 
-// type LoggerEntry struct {
-// 	logger *Logger
-// 	*logrus.Entry
-// }
-
-// // WithField returns an advanced logger with a pre-set field.
-// func (l *LoggerEntry) WithField(key string, value interface{}) loggers.Contextual {
-// 	l.Entry = l.Entry.WithField(key, value)
-// 	return &l
-// }
-
-// // WithFields returns an advanced logger with a pre-set field.
-// func (l *LoggerEntry) WithFields(fields ...interface{}) loggers.Contextual {
-
-// 	l.Entry = l.Entry.WithFields(sliceToMap(fields...))
-// 	return l
-// }
-
 func fieldsToSlice(fields logrus.Fields) []interface{} {
 	res := []interface{}{}
 	for key, value := range fields {
-		res = append(res, key)
-		res = append(res, value)
+		res = append(res, key, value)
 	}
 	return res
 }
