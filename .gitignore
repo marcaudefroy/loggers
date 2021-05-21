@@ -1,0 +1,9 @@
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Temporary files
+.DS_Store
+*.orig
+*~
