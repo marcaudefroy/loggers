@@ -24,7 +24,6 @@ func NewDefaultLogger() loggers.Contextual {
 	g.fields = []interface{}{}
 
 	a := mappers.NewContextualMap(&g)
-	a.Debug("Now using Go's stdlib log package (via loggers/mappers/stdlib).")
 
 	return a
 }
@@ -35,7 +34,6 @@ func NewLogger(l *log.Logger) loggers.Contextual {
 	g.logger = l
 	g.fields = []interface{}{}
 	a := mappers.NewContextualMap(&g)
-	a.Debug("Now using Go's stdlib log package (via loggers/mappers/stdlib).")
 
 	return a
 }
