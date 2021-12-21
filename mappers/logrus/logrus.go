@@ -17,7 +17,6 @@ type Logger struct {
 func NewLogger(log *logrus.Logger) loggers.Contextual {
 	var l Logger
 	l.Entry = logrus.NewEntry(log)
-	l.Info("Now using Logrus logger package (via loggers/mappers/logrus).")
 	return &l
 }
 
@@ -26,7 +25,6 @@ func NewLogger(log *logrus.Logger) loggers.Contextual {
 func NewDefaultLogger() loggers.Contextual {
 	var l Logger
 	l.Entry = logrus.NewEntry(logrus.New())
-	l.Info("Now using Logrus logger package (via loggers/mappers/logrus).")
 	return &l
 }
 
