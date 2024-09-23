@@ -67,12 +67,16 @@ func (l *goLog) WithField(key string, value interface{}) loggers.Contextual {
 
 // WithFields returns an Contextual logger with pre-set fields.
 func (l *goLog) WithFields(fields ...interface{}) loggers.Contextual {
-	if l.fields == nil {
-		l.fields = []interface{}{}
+	if l == nil {
+		return nil
 	}
-	l.fields = append(l.fields, fields...)
+	newL := *l
+	if newL.fields == nil {
+		newL.fields = []interface{}{}
+	}
+	newL.fields = append(newL.fields, fields...)
 
-	r := gologPostfixLogger{l}
+	r := gologPostfixLogger{&newL}
 	return mappers.NewContextualMap(&r)
 }
 
