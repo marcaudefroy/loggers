@@ -12,7 +12,7 @@ import (
 func TestLogInterface(t *testing.T) {
 	var _ loggers.Contextual = NewDefaultLogger()
 	var _ loggers.Advanced = NewDefaultLogger()
-	var _ loggers.Standard = &log.Logger{}
+	var _ loggers.Standard = NewDefaultLogger()
 }
 
 func TestLogLevelOutput(t *testing.T) {
@@ -108,7 +108,7 @@ func TestLogWithFieldsLnOutput(t *testing.T) {
 
 func NewBufferedLog() (loggers.Contextual, *bytes.Buffer) {
 	var b []byte
-	var bb = bytes.NewBuffer(b)
+	bb := bytes.NewBuffer(b)
 	l := log.New(bb, "", log.Ldate|log.Ltime)
 	return NewLogger(l), bb
 }

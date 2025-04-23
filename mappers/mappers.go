@@ -8,17 +8,16 @@ type (
 
 	// LevelMapper interfaces allows a logger to map to any Advanced Logger.
 	LevelMapper interface {
-		LevelPrint(Level, ...interface{})
-		LevelPrintf(Level, string, ...interface{})
-		LevelPrintln(Level, ...interface{})
+		LevelPrint(Level, ...any)
+		LevelPrintf(Level, string, ...any)
+		LevelPrintln(Level, ...any)
 	}
 
 	// ContextualMapper interfaces allows a logger to map to any Contextual Logger.
 	ContextualMapper interface {
 		LevelMapper
-		WithField(key string, value interface{}) loggers.Contextual
-		WithFields(fields ...interface{}) loggers.Contextual
-		Fields() []interface{}
+		WithField(key string, value any) loggers.Contextual
+		WithFields(fields ...any) loggers.Contextual
 	}
 )
 

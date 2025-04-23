@@ -3,7 +3,6 @@ package slog
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"testing"
 )
@@ -27,12 +26,11 @@ func TestSlogAdapter(t *testing.T) {
 	logger.Info("Test message", "key1", "value1", "key2", 42)
 
 	// Analyser la sortie JSON
-	var logEntry map[string]interface{}
+	var logEntry map[string]any
 	decoder := json.NewDecoder(&buf)
 	if err := decoder.Decode(&logEntry); err != nil {
 		t.Fatalf("Échec du décodage de la sortie JSON : %v", err)
 	}
-	fmt.Println(logEntry)
 
 	// Vérifier le niveau de log
 	if level, ok := logEntry["level"]; !ok || level != "INFO" {
@@ -45,7 +43,7 @@ func TestSlogAdapter(t *testing.T) {
 	}
 
 	// Vérifier les champs contextuels
-	expectedFields := map[string]interface{}{
+	expectedFields := map[string]any{
 		"component": "test",
 		"module":    "adapter",
 		"key1":      "value1",

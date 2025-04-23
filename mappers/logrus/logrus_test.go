@@ -11,7 +11,7 @@ import (
 
 func TestLogrusInterface(t *testing.T) {
 	var _ loggers.Contextual = NewDefaultLogger()
-	var _ loggers.Advanced = &logrus.Logger{}
+	var _ loggers.Advanced = NewLogger(&logrus.Logger{})
 }
 
 func TestLogrusLevelOutput(t *testing.T) {
@@ -85,20 +85,20 @@ func TestLogrusFieldsfOutput(t *testing.T) {
 	l = l.WithFields("test", true, "Error", "serious")
 	nl := l.WithField("foo", "bar")
 
-	lFields := l.Fields()
-	nlFields := nl.Fields()
+	lFields := l.GetUnderlying().(logrus.Entry).Data
+	nlFields := nl.GetUnderlying().(logrus.Entry).Data
 
-	if len(lFields) != 4 {
-		t.Errorf("Log fields must have %d elements, it have %d", 4, len(lFields))
+	if len(lFields) != 2 {
+		t.Errorf("Log fields must have %d elements, it have %d", 2, len(lFields))
 	}
-	if len(nlFields) != 6 {
-		t.Errorf("Log fields must have %d elements, it have %d", 4, len(nlFields))
+	if len(nlFields) != 3 {
+		t.Errorf("Log fields must have %d elements, it have %d", 3, len(nlFields))
 	}
 }
 
 func newBufferedLogrusLog() (loggers.Contextual, *bytes.Buffer) {
 	var b []byte
-	var bb = bytes.NewBuffer(b)
+	bb := bytes.NewBuffer(b)
 
 	l := logrus.New()
 	l.Out = bb

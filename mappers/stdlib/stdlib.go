@@ -14,14 +14,14 @@ import (
 // However it mostly ignores any level info.
 type goLog struct {
 	logger *log.Logger
-	fields []interface{}
+	fields []any
 }
 
 // NewDefaultLogger returns a Contextual logger using a log.Logger with stderr output.
 func NewDefaultLogger() loggers.Contextual {
 	var g goLog
 	g.logger = log.New(os.Stderr, "", log.Ldate|log.Ltime)
-	g.fields = []interface{}{}
+	g.fields = []any{}
 
 	a := mappers.NewContextualMap(&g)
 
@@ -32,47 +32,51 @@ func NewDefaultLogger() loggers.Contextual {
 func NewLogger(l *log.Logger) loggers.Contextual {
 	var g goLog
 	g.logger = l
-	g.fields = []interface{}{}
+	g.fields = []any{}
 	a := mappers.NewContextualMap(&g)
 
 	return a
 }
 
+func (l *goLog) GetUnderlying() any {
+	return l.logger
+}
+
 // LevelPrint is a Mapper method
-func (l *goLog) LevelPrint(lev mappers.Level, i ...interface{}) {
-	v := []interface{}{lev}
+func (l *goLog) LevelPrint(lev mappers.Level, i ...any) {
+	v := []any{lev}
 	v = append(v, i...)
 	l.logger.Print(v...)
 }
 
 // LevelPrintf is a Mapper method
-func (l *goLog) LevelPrintf(lev mappers.Level, format string, i ...interface{}) {
+func (l *goLog) LevelPrintf(lev mappers.Level, format string, i ...any) {
 	f := "%s" + format
-	v := []interface{}{lev}
+	v := []any{lev}
 	v = append(v, i...)
 	l.logger.Printf(f, v...)
 }
 
 // LevelPrintln is a Mapper method
-func (l *goLog) LevelPrintln(lev mappers.Level, i ...interface{}) {
-	v := []interface{}{lev}
+func (l *goLog) LevelPrintln(lev mappers.Level, i ...any) {
+	v := []any{lev}
 	v = append(v, i...)
 	l.logger.Println(v...)
 }
 
 // WithField returns an Contextual logger with a pre-set field.
-func (l *goLog) WithField(key string, value interface{}) loggers.Contextual {
+func (l *goLog) WithField(key string, value any) loggers.Contextual {
 	return l.WithFields(key, value)
 }
 
 // WithFields returns an Contextual logger with pre-set fields.
-func (l *goLog) WithFields(fields ...interface{}) loggers.Contextual {
+func (l *goLog) WithFields(fields ...any) loggers.Contextual {
 	if l == nil {
 		return nil
 	}
 	newL := *l
 	if newL.fields == nil {
-		newL.fields = []interface{}{}
+		newL.fields = []any{}
 	}
 	newL.fields = append(newL.fields, fields...)
 
@@ -80,16 +84,12 @@ func (l *goLog) WithFields(fields ...interface{}) loggers.Contextual {
 	return mappers.NewContextualMap(&r)
 }
 
-func (l *goLog) Fields() []interface{} {
-	return l.fields
-}
-
 type gologPostfixLogger struct {
 	*goLog
 }
 
-func (r *gologPostfixLogger) Fields() []interface{} {
-	return r.fields
+func (r *gologPostfixLogger) GetUnderlying() any {
+	return r.logger
 }
 
 func (r *gologPostfixLogger) postfixFromFields() string {
@@ -105,20 +105,20 @@ func (r *gologPostfixLogger) postfixFromFields() string {
 	return ""
 }
 
-func (r *gologPostfixLogger) LevelPrint(lev mappers.Level, i ...interface{}) {
+func (r *gologPostfixLogger) LevelPrint(lev mappers.Level, i ...any) {
 	i = append(i, " ", r.postfixFromFields())
 
 	r.goLog.LevelPrint(lev, i...)
 }
 
-func (r *gologPostfixLogger) LevelPrintf(lev mappers.Level, format string, i ...interface{}) {
+func (r *gologPostfixLogger) LevelPrintf(lev mappers.Level, format string, i ...any) {
 	format = format + " %s"
 	i = append(i, r.postfixFromFields())
 
 	r.goLog.LevelPrintf(lev, format, i...)
 }
 
-func (r *gologPostfixLogger) LevelPrintln(lev mappers.Level, i ...interface{}) {
+func (r *gologPostfixLogger) LevelPrintln(lev mappers.Level, i ...any) {
 	i = append(i, r.postfixFromFields())
 	r.goLog.LevelPrintln(lev, i...)
 }

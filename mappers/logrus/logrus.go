@@ -28,6 +28,10 @@ func NewDefaultLogger() loggers.Contextual {
 	return &l
 }
 
+func (l *Logger) GetUnderlying() any {
+	return l.Entry
+}
+
 // WithField returns an advanced logger with a pre-set field.
 func (l *Logger) WithField(key string, value interface{}) loggers.Contextual {
 	var nl Logger
@@ -40,18 +44,6 @@ func (l *Logger) WithFields(fields ...interface{}) loggers.Contextual {
 	var nl Logger
 	nl.Entry = l.Entry.WithFields(sliceToMap(fields...))
 	return &nl
-}
-
-func (l *Logger) Fields() []interface{} {
-	return fieldsToSlice(l.Entry.Data)
-}
-
-func fieldsToSlice(fields logrus.Fields) []interface{} {
-	res := []interface{}{}
-	for key, value := range fields {
-		res = append(res, key, value)
-	}
-	return res
 }
 
 func sliceToMap(fields ...interface{}) map[string]interface{} {

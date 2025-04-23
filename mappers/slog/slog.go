@@ -11,13 +11,11 @@ import (
 
 type Logger struct {
 	logger *slog.Logger
-	fields []any
 }
 
 func NewLogger(l *slog.Logger) loggers.Contextual {
 	nl := &Logger{
 		logger: l,
-		fields: []any{},
 	}
 	mp := mappers.NewContextualMap(nl)
 	return mp
@@ -30,25 +28,21 @@ func NewDefaultLogger() loggers.Contextual {
 	return NewLogger(slog.New(handler))
 }
 
+func (l *Logger) GetUnderlying() any {
+	return l.logger
+}
+
 func (l *Logger) WithField(key string, value any) loggers.Contextual {
 	return l.WithFields(key, value)
 }
 
 func (l *Logger) WithFields(fields ...any) loggers.Contextual {
 	nl := l.logger.With(fields...)
-	newFields := append([]any{}, l.fields...)
-	newFields = append(newFields, fields...)
-
 	nL := &Logger{
 		logger: nl,
-		fields: newFields,
 	}
 	mp := mappers.NewContextualMap(nL)
 	return mp
-}
-
-func (l *Logger) Fields() []any {
-	return l.fields
 }
 
 // LevelPrint is a Mapper method
@@ -67,7 +61,7 @@ func (l *Logger) LevelPrint(lev mappers.Level, i ...any) {
 		log = l.logger.Info
 	}
 	msg, args := l.extractMsgAndAttrs(i...)
-	log(msg, l.toAttrs(args...)...)
+	log(msg, args...)
 }
 
 // LevelPrintf is a Mapper method
@@ -90,17 +84,4 @@ func (l *Logger) extractMsgAndAttrs(args ...any) (string, []any) {
 		}
 	}
 	return msg, args
-}
-
-func (l *Logger) toAttrs(args ...any) []any {
-	var attrs []any
-	allArgs := append(l.fields, args...)
-	for i := 0; i+1 < len(allArgs); i += 2 {
-		key, ok := allArgs[i].(string)
-		if !ok {
-			continue
-		}
-		attrs = append(attrs, slog.Any(key, allArgs[i+1]))
-	}
-	return attrs
 }

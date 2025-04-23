@@ -23,11 +23,11 @@ func NewContextualMap(m ContextualMapper) *ContextualMap {
 }
 
 // WithField directly maps the loggers method.
-func (c *ContextualMap) WithField(key string, value interface{}) loggers.Contextual {
+func (c *ContextualMap) WithField(key string, value any) loggers.Contextual {
 	return c.ContextualMapper.WithField(key, value)
 }
 
 // WithFields directly maps the loggers method.
-func (c *ContextualMap) WithFields(fields ...interface{}) loggers.Contextual {
+func (c *ContextualMap) WithFields(fields ...any) loggers.Contextual {
 	return c.ContextualMapper.WithFields(fields...)
 }
