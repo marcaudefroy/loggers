@@ -9,23 +9,20 @@ import (
 	"github.com/marcaudefroy/loggers/mappers"
 )
 
-// Logger est un adaptateur qui implémente l'interface loggers.Contextual en utilisant slog.Logger.
 type Logger struct {
 	logger *slog.Logger
-	fields []interface{}
+	fields []any
 }
 
-// NewLogger crée un nouveau logger Contextual à partir d'un slog.Logger existant.
 func NewLogger(l *slog.Logger) loggers.Contextual {
 	nl := &Logger{
 		logger: l,
-		fields: []interface{}{},
+		fields: []any{},
 	}
 	mp := mappers.NewContextualMap(nl)
 	return mp
 }
 
-// NewDefaultLogger crée un logger Contextual avec un TextHandler par défaut.
 func NewDefaultLogger() loggers.Contextual {
 	handler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
@@ -33,15 +30,13 @@ func NewDefaultLogger() loggers.Contextual {
 	return NewLogger(slog.New(handler))
 }
 
-// WithField ajoute un champ clé-valeur au logger et retourne un nouveau logger.
-func (l *Logger) WithField(key string, value interface{}) loggers.Contextual {
+func (l *Logger) WithField(key string, value any) loggers.Contextual {
 	return l.WithFields(key, value)
 }
 
-// WithFields ajoute plusieurs champs au logger et retourne un nouveau logger.
-func (l *Logger) WithFields(fields ...interface{}) loggers.Contextual {
+func (l *Logger) WithFields(fields ...any) loggers.Contextual {
 	nl := l.logger.With(fields...)
-	newFields := append([]interface{}{}, l.fields...)
+	newFields := append([]any{}, l.fields...)
 	newFields = append(newFields, fields...)
 
 	nL := &Logger{
@@ -52,13 +47,12 @@ func (l *Logger) WithFields(fields ...interface{}) loggers.Contextual {
 	return mp
 }
 
-// Fields retourne les champs associés au logger.
-func (l *Logger) Fields() []interface{} {
+func (l *Logger) Fields() []any {
 	return l.fields
 }
 
 // LevelPrint is a Mapper method
-func (l *Logger) LevelPrint(lev mappers.Level, i ...interface{}) {
+func (l *Logger) LevelPrint(lev mappers.Level, i ...any) {
 	var log func(msg string, args ...any)
 	switch lev {
 	case mappers.LevelDebug:
@@ -77,12 +71,12 @@ func (l *Logger) LevelPrint(lev mappers.Level, i ...interface{}) {
 }
 
 // LevelPrintf is a Mapper method
-func (l *Logger) LevelPrintf(lev mappers.Level, format string, i ...interface{}) {
+func (l *Logger) LevelPrintf(lev mappers.Level, format string, i ...any) {
 	l.LevelPrint(lev, fmt.Sprintf(format, i...))
 }
 
 // LevelPrintln is a Mapper method
-func (l *Logger) LevelPrintln(lev mappers.Level, i ...interface{}) {
+func (l *Logger) LevelPrintln(lev mappers.Level, i ...any) {
 	l.LevelPrint(lev, i...)
 }
 
@@ -98,7 +92,7 @@ func (l *Logger) extractMsgAndAttrs(args ...any) (string, []any) {
 	return msg, args
 }
 
-func (l *Logger) toAttrs(args ...interface{}) []any {
+func (l *Logger) toAttrs(args ...any) []any {
 	var attrs []any
 	allArgs := append(l.fields, args...)
 	for i := 0; i+1 < len(allArgs); i += 2 {
